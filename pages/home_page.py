@@ -20,7 +20,9 @@ class HomePage(BasePage):
         self.no_results = page.get_by_test_id("no-results")
         self.sort_select = page.get_by_test_id("sort")
         self.sorting_completed = page.get_by_test_id("sorting_completed")
+        self.filter_completed = page.get_by_test_id("filter_completed")
         self.product_prices = page.get_by_test_id("product-price")
+        self.product_links = page.get_by_role("link").filter(has=self.product_names)
         # TODO B2/B4 (later): price_slider_max = page.get_by_role("slider").nth(1)
 
     def open(self):
@@ -43,9 +45,16 @@ class HomePage(BasePage):
         self.sort_select.select_option(value)
         return self
 
+    def filter_by_category(self, category: str):
+        self.page.get_by_role("checkbox", name=category, exact=True).check()
+        return self
+
     def product_card(self, name: str):
         # Exact name match: "Pliers" must not match "Combination Pliers".
         return self.product_names.filter(has_text=re.compile(rf"^\s*{re.escape(name)}\s*$"))
+
+    def product_card_price(self, name: str):
+        return self.product_links.filter(has=self.product_card(name)).get_by_test_id("product-price")
 
     def open_product(self, name: str):
         from pages.product_page import ProductPage
