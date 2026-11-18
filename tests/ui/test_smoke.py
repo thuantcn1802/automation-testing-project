@@ -7,13 +7,15 @@ from pages.contact_page import ContactPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 
+pytestmark = pytest.mark.ui
+
 
 @pytest.mark.smoke
 def test_search_returns_matching_pliers(page):
     """Goal: search filters the product grid.
     Precondition: the catalog contains pliers.
     Expected: at least one result, and every name contains 'pliers'."""
-    home = HomePage(page).open().search("pliers")
+    home = HomePage(page) .open().search("pliers")
     expect(home.search_completed).to_be_visible()
     names = home.product_names.all_inner_texts()
     assert names, "search returned no products"
@@ -26,14 +28,13 @@ def test_add_three_claw_hammers_updates_cart_badge(page):
     Precondition: the cart is empty and Claw Hammer is available.
     Expected: the cart badge shows 3."""
     product = HomePage(page).open().open_product("Claw Hammer").add_to_cart(quantity=3)
-    expect(product.cart_quantity).to_have_text("3")
-
+    expect(product.cart_quantity).to_have_text("3")  
 
 @pytest.mark.smoke
 def test_invalid_login_shows_error_and_stays_on_login(page):
     """Goal: reject invalid credentials.
     Precondition: the email address has no account.
-    Expected: an invalid credentials error and the login URL stays active."""
+    Expected: an invalid credentials error and the login URL stays  ctive."""
     login = LoginPage(page).open().login("nobody-here@example.com", "Wrong-Password-123")
     expect(login.error).to_contain_text("Invalid email or password")
     expect(page).to_have_url(re.compile(r"/auth/login$"))
